@@ -1,19 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/CL_Root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1a1a2e"
     tools:context=".MainActivity">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/LL_MainContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/LL_Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/TV_AppTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="StreamVerse"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#9B59B6" />
+
+            <TextView
+                android:id="@+id/TV_AppSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your anime &amp; drama catalog"
+                android:textSize="13sp"
+                android:textColor="#888888"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Anime / Drama Tabs -->
+        <LinearLayout
+            android:id="@+id/LL_CategoryTabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="12dp">
+
+            <Button
+                android:id="@+id/BTN_TabAnime"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="Anime"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#9B59B6"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
+                android:id="@+id/BTN_TabDrama"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="Drama"
+                android:textColor="#888888"
+                android:backgroundTint="#2a2a3e"
+                style="@style/Widget.MaterialComponents.Button" />
+        </LinearLayout>
+
+        <!-- Genre Chips -->
+        <HorizontalScrollView
+            android:id="@+id/HSV_GenreFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:id="@+id/LL_GenreChips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/CHIP_GenreLove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Love"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="8dp"
+                    android:checkable="false"
+                    app:chipBackgroundColor="#9B59B6"
+                    app:chipStrokeWidth="0dp"
+                    app:checkedIconVisible="false"
+                    style="@style/Widget.MaterialComponents.Chip.Action" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/CHIP_GenreAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Action"
+                    android:textColor="#888888"
+                    android:layout_marginEnd="8dp"
+                    android:checkable="false"
+                    app:chipBackgroundColor="#2a2a3e"
+                    app:chipStrokeWidth="0dp"
+                    app:checkedIconVisible="false"
+                    style="@style/Widget.MaterialComponents.Chip.Action" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/CHIP_GenreComedy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Comedy"
+                    android:textColor="#888888"
+                    android:checkable="false"
+                    app:chipBackgroundColor="#2a2a3e"
+                    app:chipStrokeWidth="0dp"
+                    app:checkedIconVisible="false"
+                    style="@style/Widget.MaterialComponents.Chip.Action" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Content List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/RV_ContentList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipToPadding="false" />
+
+    </LinearLayout>
+
+    <!-- FAB Add Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/BTN_AddContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="80dp"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="Add Content"
+        app:backgroundTint="#9B59B6"
+        app:tint="#FFFFFF"
+        app:fabSize="normal" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/BNV_BottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom"
+        android:background="#12122a"
+        app:itemIconTint="#9B59B6"
+        app:itemTextColor="#9B59B6"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
