@@ -12,7 +12,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
     companion object {
         const val DATABASE_NAME = "streamverse.db"
         const val DATABASE_VERSION = 1
-
         const val TABLE_CONTENT = "content"
         const val COL_ID = "id"
         const val COL_TITLE = "title"
@@ -47,52 +46,45 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    // INSERT
     fun insertContent(item: ContentItem): Long {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COL_TITLE, item.title)
-            put(COL_DESCRIPTION, item.description)
-            put(COL_EPISODE, item.episode)
-            put(COL_RATING, item.rating)
-            put(COL_CATEGORY, item.category)
-            put(COL_STATUS, item.status)
-            put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
-            put(COL_IMAGE_URI, item.imageUri)
+        return try {
+            val values = ContentValues().apply {
+                put(COL_TITLE, item.title)
+                put(COL_DESCRIPTION, item.description)
+                put(COL_EPISODE, item.episode)
+                put(COL_RATING, item.rating)
+                put(COL_CATEGORY, item.category)
+                put(COL_STATUS, item.status)
+                put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
+                put(COL_IMAGE_URI, item.imageUri)
+            }
+            db.insert(TABLE_CONTENT, null, values)
+        } catch (e: Exception) {
+            -1L
         }
-        val id = db.insert(TABLE_CONTENT, null, values)
-        db.close()
-        return id
     }
 
-    // GET ALL ANIME
-    fun getAllAnime(): MutableList<ContentItem> {
-        return getContentByType(isAnime = true)
-    }
+    fun getAllAnime(): MutableList<ContentItem> = getContentByType(true)
 
-    // GET ALL DRAMA
-    fun getAllDrama(): MutableList<ContentItem> {
-        return getContentByType(isAnime = false)
-    }
+    fun getAllDrama(): MutableList<ContentItem> = getContentByType(false)
 
-    // GET BY TYPE
     private fun getContentByType(isAnime: Boolean): MutableList<ContentItem> {
         val list = mutableListOf<ContentItem>()
         val db = readableDatabase
-        val cursor = db.query(
-            TABLE_CONTENT,
-            null,
-            "$COL_IS_ANIME = ?",
-            arrayOf(if (isAnime) "1" else "0"),
-            null, null,
-            "$COL_ID DESC"
-        )
-        if (cursor.moveToFirst()) {
-            do {
+        var cursor: android.database.Cursor? = null
+        try {
+            cursor = db.query(
+                TABLE_CONTENT, null,
+                "$COL_IS_ANIME = ?",
+                arrayOf(if (isAnime) "1" else "0"),
+                null, null, "$COL_ID DESC"
+            )
+            while (cursor.moveToNext()) {
                 list.add(
                     ContentItem(
                         id = cursor.getLong(cursor.getColumnIndexOrThrow(COL_ID)),
-                        title = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE)),
+                        title = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE)) ?: "",
                         description = cursor.getString(cursor.getColumnIndexOrThrow(COL_DESCRIPTION)) ?: "",
                         episode = cursor.getString(cursor.getColumnIndexOrThrow(COL_EPISODE)) ?: "",
                         rating = cursor.getString(cursor.getColumnIndexOrThrow(COL_RATING)) ?: "5",
@@ -102,36 +94,40 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                         imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI))
                     )
                 )
-            } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
         }
-        cursor.close()
-        db.close()
         return list
     }
 
-    // UPDATE
     fun updateContent(item: ContentItem): Int {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COL_TITLE, item.title)
-            put(COL_DESCRIPTION, item.description)
-            put(COL_EPISODE, item.episode)
-            put(COL_RATING, item.rating)
-            put(COL_CATEGORY, item.category)
-            put(COL_STATUS, item.status)
-            put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
-            put(COL_IMAGE_URI, item.imageUri)
+        return try {
+            val values = ContentValues().apply {
+                put(COL_TITLE, item.title)
+                put(COL_DESCRIPTION, item.description)
+                put(COL_EPISODE, item.episode)
+                put(COL_RATING, item.rating)
+                put(COL_CATEGORY, item.category)
+                put(COL_STATUS, item.status)
+                put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
+                put(COL_IMAGE_URI, item.imageUri)
+            }
+            db.update(TABLE_CONTENT, values, "$COL_ID = ?", arrayOf(item.id.toString()))
+        } catch (e: Exception) {
+            0
         }
-        val rows = db.update(TABLE_CONTENT, values, "$COL_ID = ?", arrayOf(item.id.toString()))
-        db.close()
-        return rows
     }
 
-    // DELETE
     fun deleteContent(id: Long): Int {
         val db = writableDatabase
-        val rows = db.delete(TABLE_CONTENT, "$COL_ID = ?", arrayOf(id.toString()))
-        db.close()
-        return rows
+        return try {
+            db.delete(TABLE_CONTENT, "$COL_ID = ?", arrayOf(id.toString()))
+        } catch (e: Exception) {
+            0
+        }
     }
 }

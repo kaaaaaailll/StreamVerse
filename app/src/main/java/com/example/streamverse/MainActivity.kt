@@ -18,6 +18,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -111,6 +114,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupAdapters() {
         animeAdapter = ContentAdapter(animeList) { item -> showDetailDialog(item) }
         dramaAdapter = ContentAdapter(dramaList) { item -> showDetailDialog(item) }
+        animeAdapter.setHasStableIds(true)
+        dramaAdapter.setHasStableIds(true)
+        rvContentList.itemAnimator = null
         rvContentList.adapter = animeAdapter
         applyFilter()
     }
@@ -222,8 +228,18 @@ class MainActivity : AppCompatActivity() {
             btnMarkComplete.alpha = 0.5f
         }
 
+        // Use Glide for detail dialog image too
         if (item.imageUri != null) {
-            ivImage.setImageURI(Uri.parse(item.imageUri))
+            Glide.with(this)
+                .load(Uri.parse(item.imageUri))
+                .apply(
+                    RequestOptions()
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_gallery)
+                )
+                .into(ivImage)
         }
 
         seekBarRating.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -242,7 +258,6 @@ class MainActivity : AppCompatActivity() {
 
         btnClose.setOnClickListener { dialog.dismiss() }
 
-        // Delete button with confirmation
         btnDelete.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Delete")
@@ -414,7 +429,15 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             selectedImageUri = data?.data
             selectedImageUri?.let { uri ->
-                currentPreviewImage?.setImageURI(uri)
+                // Use Glide for preview image too
+                Glide.with(this)
+                    .load(uri)
+                    .apply(
+                        RequestOptions()
+                            .centerCrop()
+                            .placeholder(android.R.drawable.ic_menu_gallery)
+                    )
+                    .into(currentPreviewImage!!)
                 currentPreviewImage?.visibility = View.VISIBLE
                 currentPlaceholder?.visibility = View.GONE
             }
