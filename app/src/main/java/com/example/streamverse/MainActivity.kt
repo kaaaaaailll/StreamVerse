@@ -49,6 +49,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var animeAdapter: ContentAdapter
     private lateinit var dramaAdapter: ContentAdapter
 
+    // Database
+    private lateinit var dbHelper: DatabaseHelper
+
     companion object {
         const val PICK_IMAGE_REQUEST = 1001
     }
@@ -56,10 +59,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Init database
+        dbHelper = DatabaseHelper(this)
+
         initViews()
+        loadFromDatabase()
         setupAdapters()
         setupListeners()
         animateFab()
+    }
+
+    // Load data from SQLite on startup
+    private fun loadFromDatabase() {
+        animeList.clear()
+        animeList.addAll(dbHelper.getAllAnime())
+        dramaList.clear()
+        dramaList.addAll(dbHelper.getAllDrama())
     }
 
     private fun animateFab() {
@@ -101,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         animeAdapter = ContentAdapter(animeList) { item -> showDetailDialog(item) }
         dramaAdapter = ContentAdapter(dramaList) { item -> showDetailDialog(item) }
         rvContentList.adapter = animeAdapter
+        applyFilter()
     }
 
     private fun applyFilter() {
@@ -219,6 +236,7 @@ class MainActivity : AppCompatActivity() {
                 currentRating = progress + 1
                 tvRating.text = currentRating.toString()
                 val updatedItem = currentItem.copy(rating = currentRating.toString())
+                dbHelper.updateContent(updatedItem)
                 updateItemInList(currentItem, updatedItem)
                 currentItem = updatedItem
             }
@@ -242,6 +260,7 @@ class MainActivity : AppCompatActivity() {
                         val newEpisodeText = if (currentItem.isAnime) "Episode $newEp"
                         else "Episode $newEp · ${currentItem.status}"
                         val updatedItem = currentItem.copy(episode = newEpisodeText)
+                        dbHelper.updateContent(updatedItem)
                         updateItemInList(currentItem, updatedItem)
                         currentItem = updatedItem
                         tvEpisode.text = updatedItem.episode
@@ -257,6 +276,7 @@ class MainActivity : AppCompatActivity() {
                 status = "Complete",
                 episode = currentItem.episode.replace("Ongoing", "Complete")
             )
+            dbHelper.updateContent(updatedItem)
             updateItemInList(currentItem, updatedItem)
             currentItem = updatedItem
             chipStatus.text = "Complete"
@@ -269,14 +289,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateItemInList(old: ContentItem, new: ContentItem) {
-        val animeIdx = animeList.indexOfFirst { it.title == old.title && it.isAnime == old.isAnime }
-        if (animeIdx >= 0) {
-            animeList[animeIdx] = new
-        }
-        val dramaIdx = dramaList.indexOfFirst { it.title == old.title && it.isAnime == old.isAnime }
-        if (dramaIdx >= 0) {
-            dramaList[dramaIdx] = new
-        }
+        val animeIdx = animeList.indexOfFirst { it.id == old.id }
+        if (animeIdx >= 0) animeList[animeIdx] = new
+
+        val dramaIdx = dramaList.indexOfFirst { it.id == old.id }
+        if (dramaIdx >= 0) dramaList[dramaIdx] = new
+
         applyFilter()
     }
 
@@ -363,8 +381,12 @@ class MainActivity : AppCompatActivity() {
                 imageUri = selectedImageUri?.toString()
             )
 
-            if (isAnimeTab) animeList.add(0, newItem)
-            else dramaList.add(0, newItem)
+            // Save to database and get the real ID back
+            val newId = dbHelper.insertContent(newItem)
+            val savedItem = newItem.copy(id = newId)
+
+            if (isAnimeTab) animeList.add(0, savedItem)
+            else dramaList.add(0, savedItem)
 
             applyFilter()
 

@@ -1,6 +1,7 @@
 package com.example.streamverse
 
 data class ContentItem(
+    val id: Long = 0,
     val title: String,
     val description: String,
     val episode: String,
