@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var animeAdapter: ContentAdapter
     private lateinit var dramaAdapter: ContentAdapter
 
-    // Database
     private lateinit var dbHelper: DatabaseHelper
 
     companion object {
@@ -59,10 +58,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Init database
         dbHelper = DatabaseHelper(this)
-
         initViews()
         loadFromDatabase()
         setupAdapters()
@@ -70,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         animateFab()
     }
 
-    // Load data from SQLite on startup
     private fun loadFromDatabase() {
         animeList.clear()
         animeList.addAll(dbHelper.getAllAnime())
@@ -206,6 +201,7 @@ class MainActivity : AppCompatActivity() {
         val chipCategory = dialog.findViewById<Chip>(R.id.CHIP_DetailCategory)
         val chipStatus = dialog.findViewById<Chip>(R.id.CHIP_DetailStatus)
         val btnClose = dialog.findViewById<ImageButton>(R.id.BTN_CloseDetail)
+        val btnDelete = dialog.findViewById<ImageButton>(R.id.BTN_DeleteContent)
         val btnEditEpisode = dialog.findViewById<MaterialButton>(R.id.BTN_EditEpisode)
         val btnMarkComplete = dialog.findViewById<MaterialButton>(R.id.BTN_MarkComplete)
 
@@ -245,6 +241,22 @@ class MainActivity : AppCompatActivity() {
         })
 
         btnClose.setOnClickListener { dialog.dismiss() }
+
+        // Delete button with confirmation
+        btnDelete.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete")
+                .setMessage("Are you sure you want to delete \"${item.title}\"?")
+                .setPositiveButton("Delete") { _, _ ->
+                    dbHelper.deleteContent(item.id)
+                    animeList.removeAll { it.id == item.id }
+                    dramaList.removeAll { it.id == item.id }
+                    applyFilter()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
 
         btnEditEpisode.setOnClickListener {
             val editText = EditText(this)
@@ -381,7 +393,6 @@ class MainActivity : AppCompatActivity() {
                 imageUri = selectedImageUri?.toString()
             )
 
-            // Save to database and get the real ID back
             val newId = dbHelper.insertContent(newItem)
             val savedItem = newItem.copy(id = newId)
 
