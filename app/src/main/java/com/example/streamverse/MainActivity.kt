@@ -111,6 +111,16 @@ class MainActivity : AppCompatActivity() {
         } else {
             dramaAdapter.updateList(filtered)
         }
+
+        val emptyState = findViewById<View>(R.id.LL_EmptyState)
+        val recyclerView = findViewById<RecyclerView>(R.id.RV_ContentList)
+        if (filtered.isEmpty()) {
+            emptyState.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+        } else {
+            emptyState.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+        }
     }
 
     private fun setupListeners() {
@@ -182,7 +192,7 @@ class MainActivity : AppCompatActivity() {
         val btnEditEpisode = dialog.findViewById<MaterialButton>(R.id.BTN_EditEpisode)
         val btnMarkComplete = dialog.findViewById<MaterialButton>(R.id.BTN_MarkComplete)
 
-        // Track current rating inside dialog
+        var currentItem = item
         var currentRating = item.rating.toIntOrNull() ?: 5
 
         tvDialogTitle.text = if (item.isAnime) "Anime Details" else "Drama Details"
@@ -192,21 +202,7 @@ class MainActivity : AppCompatActivity() {
         tvRating.text = currentRating.toString()
         chipCategory.text = item.category
         chipStatus.text = item.status
-
-        // Set seekbar to current rating (progress is 0-9, rating is 1-10)
         seekBarRating.progress = currentRating - 1
-
-        seekBarRating.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentRating = progress + 1
-                tvRating.text = currentRating.toString()
-                // Save rating change immediately to the item
-                val updatedItem = item.copy(rating = currentRating.toString())
-                updateItemInList(item, updatedItem)
-            }
-            override fun onStartTrackingTouch(sb: SeekBar?) {}
-            override fun onStopTrackingTouch(sb: SeekBar?) {}
-        })
 
         if (item.status == "Complete") {
             btnMarkComplete.isEnabled = false
@@ -217,12 +213,25 @@ class MainActivity : AppCompatActivity() {
             ivImage.setImageURI(Uri.parse(item.imageUri))
         }
 
+        seekBarRating.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser) return
+                currentRating = progress + 1
+                tvRating.text = currentRating.toString()
+                val updatedItem = currentItem.copy(rating = currentRating.toString())
+                updateItemInList(currentItem, updatedItem)
+                currentItem = updatedItem
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) {}
+            override fun onStopTrackingTouch(sb: SeekBar?) {}
+        })
+
         btnClose.setOnClickListener { dialog.dismiss() }
 
         btnEditEpisode.setOnClickListener {
             val editText = EditText(this)
             editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            editText.setText(item.episode.replace("Episode ", "").split(" ·")[0].trim())
+            editText.setText(currentItem.episode.replace("Episode ", "").split(" ·")[0].trim())
             editText.setTextColor(getColor(android.R.color.white))
             AlertDialog.Builder(this)
                 .setTitle("Edit Episode")
@@ -230,10 +239,11 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton("Save") { _, _ ->
                     val newEp = editText.text.toString().trim()
                     if (newEp.isNotEmpty()) {
-                        val newEpisodeText = if (item.isAnime) "Episode $newEp"
-                        else "Episode $newEp · ${item.status}"
-                        val updatedItem = item.copy(episode = newEpisodeText)
-                        updateItemInList(item, updatedItem)
+                        val newEpisodeText = if (currentItem.isAnime) "Episode $newEp"
+                        else "Episode $newEp · ${currentItem.status}"
+                        val updatedItem = currentItem.copy(episode = newEpisodeText)
+                        updateItemInList(currentItem, updatedItem)
+                        currentItem = updatedItem
                         tvEpisode.text = updatedItem.episode
                         dialog.dismiss()
                     }
@@ -243,11 +253,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnMarkComplete.setOnClickListener {
-            val updatedItem = item.copy(
+            val updatedItem = currentItem.copy(
                 status = "Complete",
-                episode = item.episode.replace("Ongoing", "Complete")
+                episode = currentItem.episode.replace("Ongoing", "Complete")
             )
-            updateItemInList(item, updatedItem)
+            updateItemInList(currentItem, updatedItem)
+            currentItem = updatedItem
             chipStatus.text = "Complete"
             btnMarkComplete.isEnabled = false
             btnMarkComplete.alpha = 0.5f
@@ -258,10 +269,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateItemInList(old: ContentItem, new: ContentItem) {
-        val animeIdx = animeList.indexOf(old)
-        if (animeIdx >= 0) { animeList[animeIdx] = new; animeAdapter.notifyItemChanged(animeIdx) }
-        val dramaIdx = dramaList.indexOf(old)
-        if (dramaIdx >= 0) { dramaList[dramaIdx] = new; dramaAdapter.notifyItemChanged(dramaIdx) }
+        val animeIdx = animeList.indexOfFirst { it.title == old.title && it.isAnime == old.isAnime }
+        if (animeIdx >= 0) {
+            animeList[animeIdx] = new
+        }
+        val dramaIdx = dramaList.indexOfFirst { it.title == old.title && it.isAnime == old.isAnime }
+        if (dramaIdx >= 0) {
+            dramaList[dramaIdx] = new
+        }
+        applyFilter()
     }
 
     private fun showAddContentDialog() {
@@ -340,7 +356,7 @@ class MainActivity : AppCompatActivity() {
                 title = title,
                 description = description,
                 episode = episodeText,
-                rating = "5", // Default rating, editable in detail view
+                rating = "5",
                 category = selectedCategory,
                 status = selectedStatus,
                 isAnime = isAnimeTab,

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#0d0d1a">
+
+    <ImageView
+        android:id="@+id/IV_SplashLogo"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:src="@drawable/stream_verse"
+        android:scaleType="fitCenter"
+        android:alpha="0" />
+
+    <TextView
+        android:id="@+id/TV_SplashTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="StreamVerse"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="#c084fc"
+        android:letterSpacing="0.05"
+        android:layout_marginTop="16dp"
+        android:alpha="0" />
+
+    <TextView
+        android:id="@+id/TV_SplashSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My anime &amp; drama catalog"
+        android:textSize="14sp"
+        android:textColor="#7a7a9a"
+        android:layout_marginTop="8dp"
+        android:alpha="0" />
+
+</LinearLayout>

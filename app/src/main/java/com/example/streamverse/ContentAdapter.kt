@@ -4,9 +4,9 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.imageview.ShapeableImageView
 
 class ContentAdapter(
     private val items: MutableList<ContentItem>,
@@ -16,7 +16,7 @@ class ContentAdapter(
     private val displayItems = mutableListOf<ContentItem>().also { it.addAll(items) }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val thumbnail: ShapeableImageView = view.findViewById(R.id.IV_Thumbnail)
+        val thumbnail: ImageView = view.findViewById(R.id.IV_Thumbnail)
         val title: TextView = view.findViewById(R.id.TV_ContentTitle)
         val description: TextView = view.findViewById(R.id.TV_ContentDescription)
         val episode: TextView = view.findViewById(R.id.TV_EpisodeInfo)

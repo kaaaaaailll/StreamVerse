@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="60dp">
+        android:paddingBottom="80dp">
 
         <!-- Header -->
         <LinearLayout
@@ -41,7 +41,7 @@
                 android:id="@+id/TV_AppSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your anime &amp; drama catalog"
+                android:text="My anime &amp; drama catalog"
                 android:textSize="13sp"
                 android:textColor="#7a7a9a"
                 android:layout_marginTop="2dp" />
@@ -218,7 +218,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="76dp"
+        android:layout_marginBottom="80dp"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="Add Content"
         app:backgroundTint="#c084fc"
@@ -232,9 +232,10 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/BNV_BottomNav"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#0d0d1a"
+        android:paddingBottom="8dp"
         app:itemIconTint="#c084fc"
         app:itemTextColor="#c084fc"
         app:labelVisibilityMode="labeled"
