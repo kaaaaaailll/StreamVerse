@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#0d0d1a">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Title Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/TV_DialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Anime"
+                android:textColor="#c084fc"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.01" />
+
+            <ImageButton
+                android:id="@+id/BTN_CloseDialog"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="@null"
+                android:tint="#7a7a9a"
+                android:contentDescription="Close" />
+        </LinearLayout>
+
+        <!-- Picture Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Picture"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/BTN_UploadPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Upload Photo"
+            android:textColor="@color/white"
+            app:icon="@android:drawable/ic_menu_upload"
+            app:iconTint="@color/white"
+            app:iconPadding="8dp"
+            app:backgroundTint="#1e1e35"
+            app:strokeColor="#2e2e50"
+            app:strokeWidth="1dp"
+            app:cornerRadius="14dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Image Preview -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:id="@+id/IV_ImagePreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_image_preview"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/LL_ImagePlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_image_preview">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    android:alpha="0.3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Image preview"
+                    android:textColor="#7a7a9a"
+                    android:textSize="13sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:boxBackgroundColor="#1e1e35"
+            app:boxStrokeColor="#c084fc"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:hintTextColor="#7a7a9a"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ET_Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter title..."
+                android:textColor="@color/white"
+                android:textColorHint="#7a7a9a"
+                android:background="@null" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:boxBackgroundColor="#1e1e35"
+            app:boxStrokeColor="#c084fc"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:hintTextColor="#7a7a9a"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ET_Description"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:hint="Enter description..."
+                android:textColor="@color/white"
+                android:textColorHint="#7a7a9a"
+                android:gravity="top"
+                android:background="@null" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Category -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <LinearLayout
+            android:id="@+id/LL_CategoryChips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/CHIP_CatLove"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Love"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:checkable="false"
+                android:layout_marginEnd="8dp"
+                app:chipBackgroundColor="@color/purple_primary"
+                app:chipStrokeWidth="0dp"
+                app:checkedIconVisible="false"
+                app:chipCornerRadius="18dp"
+                style="@style/Widget.MaterialComponents.Chip.Action" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/CHIP_CatAction"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Action"
+                android:textColor="#7a7a9a"
+                android:checkable="false"
+                android:layout_marginEnd="8dp"
+                app:chipBackgroundColor="#1e1e35"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="#2e2e50"
+                app:checkedIconVisible="false"
+                app:chipCornerRadius="18dp"
+                style="@style/Widget.MaterialComponents.Chip.Action" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/CHIP_CatComedy"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Comedy"
+                android:textColor="#7a7a9a"
+                android:checkable="false"
+                android:visibility="gone"
+                app:chipBackgroundColor="#1e1e35"
+                app:chipStrokeWidth="1dp"
+                app:chipStrokeColor="#2e2e50"
+                app:checkedIconVisible="false"
+                app:chipCornerRadius="18dp"
+                style="@style/Widget.MaterialComponents.Chip.Action" />
+        </LinearLayout>
+
+        <!-- Status -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/BTN_StatusOngoing"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:text="Ongoing"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/purple_primary"
+                app:strokeWidth="0dp"
+                app:cornerRadius="14dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/BTN_StatusComplete"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:text="Complete"
+                android:textColor="#7a7a9a"
+                app:backgroundTint="#1e1e35"
+                app:strokeColor="#2e2e50"
+                app:strokeWidth="1dp"
+                app:cornerRadius="14dp" />
+        </LinearLayout>
+
+        <!-- Current Episode -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Episode"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp"
+            app:boxBackgroundColor="#1e1e35"
+            app:boxStrokeColor="#c084fc"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ET_Episode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textColor="@color/white"
+                android:inputType="number"
+                android:background="@null" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Save Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/BTN_SaveContent"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:text="Save Anime"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconTint="@color/white"
+            app:iconPadding="8dp"
+            app:backgroundTint="@color/purple_primary"
+            app:cornerRadius="16dp"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -2,10 +2,16 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="bg_dark">#1a1a2e</color>
-    <color name="bg_card">#2a2a3e</color>
-    <color name="bg_nav">#12122a</color>
-    <color name="text_secondary">#888888</color>
+    <color name="bg_dark">#0d0d1a</color>
+    <color name="bg_card">#1a1a2e</color>
+    <color name="bg_nav">#0d0d1a</color>
+    <color name="text_secondary">#7a7a9a</color>
     <color name="purple_primary">#9B59B6</color>
     <color name="purple_500">#9B59B6</color>
+    <color name="purple_light">#c084fc</color>
+    <color name="purple_dark">#6d28d9</color>
+    <color name="purple_glow">#4d1a6e</color>
+    <color name="card_glass">#1e1e35</color>
+    <color name="card_border">#2e2e50</color>
+    <color name="green_complete">#22c55e</color>
 </resources>

@@ -6,7 +6,7 @@
     android:id="@+id/CL_Root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark"
+    android:background="#0d0d1a"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -24,7 +24,7 @@
             android:orientation="vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingTop="32dp"
+            android:paddingTop="36dp"
             android:paddingBottom="16dp">
 
             <TextView
@@ -32,9 +32,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="StreamVerse"
-                android:textSize="30sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
-                android:textColor="@color/purple_primary"
+                android:textColor="#c084fc"
                 android:letterSpacing="0.02" />
 
             <TextView
@@ -43,8 +43,9 @@
                 android:layout_height="wrap_content"
                 android:text="Your anime &amp; drama catalog"
                 android:textSize="13sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="#7a7a9a"
                 android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
         <!-- Anime / Drama Tabs -->
@@ -55,21 +56,23 @@
             android:orientation="horizontal"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingBottom="14dp">
+            android:paddingBottom="16dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/BTN_TabAnime"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="  Anime"
+                android:text="Anime"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginEnd="10dp"
-                android:drawableStart="@android:drawable/ic_media_play"
-                android:drawablePadding="4dp"
-                app:backgroundTint="@color/purple_primary"
+                app:icon="@drawable/ic_anime"
+                app:iconTint="@color/white"
+                app:iconPadding="6dp"
+                app:iconGravity="textStart"
+                app:backgroundTint="#9B59B6"
                 app:strokeWidth="0dp"
                 app:cornerRadius="14dp" />
 
@@ -78,14 +81,16 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="  Drama"
-                android:textColor="@color/text_secondary"
+                android:text="Drama"
+                android:textColor="#7a7a9a"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:drawableStart="@android:drawable/ic_menu_slideshow"
-                android:drawablePadding="4dp"
-                app:backgroundTint="@color/bg_card"
-                app:strokeColor="@color/text_secondary"
+                app:icon="@drawable/ic_drama"
+                app:iconTint="#7a7a9a"
+                app:iconPadding="6dp"
+                app:iconGravity="textStart"
+                app:backgroundTint="#1a1a2e"
+                app:strokeColor="#2e2e50"
                 app:strokeWidth="1dp"
                 app:cornerRadius="14dp" />
 
@@ -110,52 +115,88 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/CHIP_GenreLove"
                     android:layout_width="wrap_content"
-                    android:layout_height="38dp"
+                    android:layout_height="36dp"
                     android:text="Love"
                     android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
                     android:layout_marginEnd="8dp"
                     android:checkable="false"
-                    app:chipBackgroundColor="@color/purple_primary"
+                    app:chipBackgroundColor="#9B59B6"
                     app:chipStrokeWidth="0dp"
                     app:checkedIconVisible="false"
-                    app:chipCornerRadius="20dp"
+                    app:chipCornerRadius="18dp"
                     style="@style/Widget.MaterialComponents.Chip.Action" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/CHIP_GenreAction"
                     android:layout_width="wrap_content"
-                    android:layout_height="38dp"
+                    android:layout_height="36dp"
                     android:text="Action"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
+                    android:textColor="#7a7a9a"
+                    android:textSize="13sp"
                     android:layout_marginEnd="8dp"
                     android:checkable="false"
-                    app:chipBackgroundColor="@color/bg_card"
+                    app:chipBackgroundColor="#1a1a2e"
                     app:chipStrokeWidth="1dp"
-                    app:chipStrokeColor="@color/text_secondary"
+                    app:chipStrokeColor="#2e2e50"
                     app:checkedIconVisible="false"
-                    app:chipCornerRadius="20dp"
+                    app:chipCornerRadius="18dp"
                     style="@style/Widget.MaterialComponents.Chip.Action" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/CHIP_GenreComedy"
                     android:layout_width="wrap_content"
-                    android:layout_height="38dp"
+                    android:layout_height="36dp"
                     android:text="Comedy"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
+                    android:textColor="#7a7a9a"
+                    android:textSize="13sp"
                     android:layout_marginEnd="8dp"
                     android:checkable="false"
-                    app:chipBackgroundColor="@color/bg_card"
+                    app:chipBackgroundColor="#1a1a2e"
                     app:chipStrokeWidth="1dp"
-                    app:chipStrokeColor="@color/text_secondary"
+                    app:chipStrokeColor="#2e2e50"
                     app:checkedIconVisible="false"
-                    app:chipCornerRadius="20dp"
+                    app:chipCornerRadius="18dp"
                     style="@style/Widget.MaterialComponents.Chip.Action" />
 
             </LinearLayout>
         </HorizontalScrollView>
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/LL_EmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:alpha="0.2"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nothing here yet"
+                android:textColor="#7a7a9a"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap + to add your first title"
+                android:textColor="#4a4a6a"
+                android:textSize="13sp" />
+
+        </LinearLayout>
 
         <!-- Content List -->
         <androidx.recyclerview.widget.RecyclerView
@@ -165,6 +206,7 @@
             android:layout_weight="1"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:paddingTop="4dp"
             android:clipToPadding="false" />
 
     </LinearLayout>
@@ -179,10 +221,12 @@
         android:layout_marginBottom="76dp"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="Add Content"
-        app:backgroundTint="@color/purple_primary"
+        app:backgroundTint="#c084fc"
         app:tint="@color/white"
         app:fabSize="normal"
-        app:borderWidth="0dp" />
+        app:borderWidth="0dp"
+        app:elevation="12dp"
+        app:hoveredFocusedTranslationZ="6dp" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -190,9 +234,9 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="bottom"
-        android:background="@color/bg_nav"
-        app:itemIconTint="@color/purple_primary"
-        app:itemTextColor="@color/purple_primary"
+        android:background="#0d0d1a"
+        app:itemIconTint="#c084fc"
+        app:itemTextColor="#c084fc"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 

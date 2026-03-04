@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#0d0d1a">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Title Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/TV_DetailDialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Drama Details"
+                android:textColor="#c084fc"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.01" />
+
+            <ImageButton
+                android:id="@+id/BTN_CloseDetail"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="@null"
+                android:tint="#7a7a9a"
+                android:contentDescription="Close" />
+        </LinearLayout>
+
+        <!-- Cover Image -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#1e1e35">
+
+            <ImageView
+                android:id="@+id/IV_DetailImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Content Title -->
+        <TextView
+            android:id="@+id/TV_DetailContentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.01"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Tags Row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="18dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/CHIP_DetailCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Love"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:checkable="false"
+                android:layout_marginEnd="8dp"
+                app:chipBackgroundColor="@color/purple_primary"
+                app:chipStrokeWidth="0dp"
+                app:checkedIconVisible="false"
+                app:chipCornerRadius="16dp"
+                style="@style/Widget.MaterialComponents.Chip.Action" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/CHIP_DetailStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Ongoing"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:checkable="false"
+                app:chipBackgroundColor="@color/purple_dark"
+                app:chipStrokeWidth="0dp"
+                app:checkedIconVisible="false"
+                app:chipCornerRadius="16dp"
+                style="@style/Widget.MaterialComponents.Chip.Action" />
+        </LinearLayout>
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textColor="#7a7a9a"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:id="@+id/TV_DetailDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#d0d0e8"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.5"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1e1e35"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Current Episode Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Episode"
+                    android:textColor="#7a7a9a"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/TV_DetailEpisode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/BTN_EditEpisode"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="Edit"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:backgroundTint="#1e1e35"
+                app:strokeColor="#2e2e50"
+                app:strokeWidth="1dp"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1e1e35"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Rating with SeekBar for editing -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textColor="#7a7a9a"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="★ "
+                    android:textColor="#FFD700"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/TV_DetailRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD700"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" / 10"
+                    android:textColor="#7a7a9a"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/SB_DetailRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="9"
+            android:progress="4"
+            android:progressTint="#c084fc"
+            android:thumbTint="#c084fc"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="28dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1"
+                android:textColor="#7a7a9a"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:textColor="#7a7a9a"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Mark as Complete Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/BTN_MarkComplete"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:text="✓  Mark as Complete"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.03"
+            app:backgroundTint="#22c55e"
+            app:cornerRadius="16dp"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -6,4 +6,17 @@
     </style>
 
     <style name="Theme.StreamVerse" parent="Base.Theme.StreamVerse" />
+
+    <!-- Full Dialog Theme for Add Content -->
+    <style name="Theme.StreamVerse.FullDialog" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <!-- Rounded Thumbnail for ShapeableImageView -->
+    <style name="RoundedThumbnail" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">14dp</item>
+    </style>
+
 </resources>

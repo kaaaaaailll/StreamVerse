@@ -1,18 +1,33 @@
 package com.example.streamverse
 
-import androidx.appcompat.app.AppCompatActivity
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.app.Activity
+import android.app.Dialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
+import android.view.animation.OvershootInterpolator
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var btnTabAnime: Button
-    private lateinit var btnTabDrama: Button
+    private lateinit var btnTabAnime: MaterialButton
+    private lateinit var btnTabDrama: MaterialButton
     private lateinit var chipLove: Chip
     private lateinit var chipAction: Chip
     private lateinit var chipComedy: Chip
@@ -20,12 +35,54 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var rvContentList: RecyclerView
 
+    private var isAnimeTab = true
+    private var selectedImageUri: Uri? = null
+    private var selectedCategory = "Love"
+    private var selectedStatus = "Ongoing"
+    private var activeGenreFilter = "Love"
+
+    private var currentPreviewImage: ImageView? = null
+    private var currentPlaceholder: View? = null
+
+    private val animeList = mutableListOf<ContentItem>()
+    private val dramaList = mutableListOf<ContentItem>()
+    private lateinit var animeAdapter: ContentAdapter
+    private lateinit var dramaAdapter: ContentAdapter
+
+    companion object {
+        const val PICK_IMAGE_REQUEST = 1001
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         initViews()
+        setupAdapters()
         setupListeners()
+        animateFab()
+    }
+
+    private fun animateFab() {
+        btnAddContent.scaleX = 0f
+        btnAddContent.scaleY = 0f
+        btnAddContent.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(500)
+            .setStartDelay(300)
+            .setInterpolator(OvershootInterpolator(2f))
+            .start()
+
+        val pulse = ObjectAnimator.ofPropertyValuesHolder(
+            btnAddContent,
+            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.08f, 1f),
+            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.08f, 1f)
+        ).apply {
+            duration = 2000
+            repeatCount = ObjectAnimator.INFINITE
+            startDelay = 1000
+        }
+        pulse.start()
     }
 
     private fun initViews() {
@@ -40,23 +97,60 @@ class MainActivity : AppCompatActivity() {
         rvContentList.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun setupListeners() {
+    private fun setupAdapters() {
+        animeAdapter = ContentAdapter(animeList) { item -> showDetailDialog(item) }
+        dramaAdapter = ContentAdapter(dramaList) { item -> showDetailDialog(item) }
+        rvContentList.adapter = animeAdapter
+    }
 
+    private fun applyFilter() {
+        val sourceList = if (isAnimeTab) animeList else dramaList
+        val filtered = sourceList.filter { it.category == activeGenreFilter }
+        if (isAnimeTab) {
+            animeAdapter.updateList(filtered)
+        } else {
+            dramaAdapter.updateList(filtered)
+        }
+    }
+
+    private fun setupListeners() {
         btnTabAnime.setOnClickListener {
+            isAnimeTab = true
             setActiveTab(isAnime = true)
+            chipComedy.visibility = View.VISIBLE
+            activeGenreFilter = "Love"
+            setActiveChip(chipLove)
+            rvContentList.adapter = animeAdapter
+            applyFilter()
         }
 
         btnTabDrama.setOnClickListener {
+            isAnimeTab = false
             setActiveTab(isAnime = false)
+            chipComedy.visibility = View.GONE
+            activeGenreFilter = "Love"
+            setActiveChip(chipLove)
+            rvContentList.adapter = dramaAdapter
+            applyFilter()
         }
 
-        chipLove.setOnClickListener { setActiveChip(chipLove) }
-        chipAction.setOnClickListener { setActiveChip(chipAction) }
-        chipComedy.setOnClickListener { setActiveChip(chipComedy) }
-
-        btnAddContent.setOnClickListener {
-            // TODO: Open Add Content screen
+        chipLove.setOnClickListener {
+            activeGenreFilter = "Love"
+            setActiveChip(chipLove)
+            applyFilter()
         }
+        chipAction.setOnClickListener {
+            activeGenreFilter = "Action"
+            setActiveChip(chipAction)
+            applyFilter()
+        }
+        chipComedy.setOnClickListener {
+            activeGenreFilter = "Comedy"
+            setActiveChip(chipComedy)
+            applyFilter()
+        }
+
+        btnAddContent.setOnClickListener { showAddContentDialog() }
 
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -66,17 +160,259 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showDetailDialog(item: ContentItem) {
+        val dialog = Dialog(this, R.style.Theme_StreamVerse_FullDialog)
+        dialog.setContentView(R.layout.dialog_detail)
+        dialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setGravity(android.view.Gravity.BOTTOM)
+
+        val tvDialogTitle = dialog.findViewById<TextView>(R.id.TV_DetailDialogTitle)
+        val ivImage = dialog.findViewById<ImageView>(R.id.IV_DetailImage)
+        val tvTitle = dialog.findViewById<TextView>(R.id.TV_DetailContentTitle)
+        val tvDescription = dialog.findViewById<TextView>(R.id.TV_DetailDescription)
+        val tvEpisode = dialog.findViewById<TextView>(R.id.TV_DetailEpisode)
+        val tvRating = dialog.findViewById<TextView>(R.id.TV_DetailRating)
+        val seekBarRating = dialog.findViewById<SeekBar>(R.id.SB_DetailRating)
+        val chipCategory = dialog.findViewById<Chip>(R.id.CHIP_DetailCategory)
+        val chipStatus = dialog.findViewById<Chip>(R.id.CHIP_DetailStatus)
+        val btnClose = dialog.findViewById<ImageButton>(R.id.BTN_CloseDetail)
+        val btnEditEpisode = dialog.findViewById<MaterialButton>(R.id.BTN_EditEpisode)
+        val btnMarkComplete = dialog.findViewById<MaterialButton>(R.id.BTN_MarkComplete)
+
+        // Track current rating inside dialog
+        var currentRating = item.rating.toIntOrNull() ?: 5
+
+        tvDialogTitle.text = if (item.isAnime) "Anime Details" else "Drama Details"
+        tvTitle.text = item.title
+        tvDescription.text = item.description
+        tvEpisode.text = item.episode
+        tvRating.text = currentRating.toString()
+        chipCategory.text = item.category
+        chipStatus.text = item.status
+
+        // Set seekbar to current rating (progress is 0-9, rating is 1-10)
+        seekBarRating.progress = currentRating - 1
+
+        seekBarRating.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                currentRating = progress + 1
+                tvRating.text = currentRating.toString()
+                // Save rating change immediately to the item
+                val updatedItem = item.copy(rating = currentRating.toString())
+                updateItemInList(item, updatedItem)
+            }
+            override fun onStartTrackingTouch(sb: SeekBar?) {}
+            override fun onStopTrackingTouch(sb: SeekBar?) {}
+        })
+
+        if (item.status == "Complete") {
+            btnMarkComplete.isEnabled = false
+            btnMarkComplete.alpha = 0.5f
+        }
+
+        if (item.imageUri != null) {
+            ivImage.setImageURI(Uri.parse(item.imageUri))
+        }
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+
+        btnEditEpisode.setOnClickListener {
+            val editText = EditText(this)
+            editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            editText.setText(item.episode.replace("Episode ", "").split(" ·")[0].trim())
+            editText.setTextColor(getColor(android.R.color.white))
+            AlertDialog.Builder(this)
+                .setTitle("Edit Episode")
+                .setView(editText)
+                .setPositiveButton("Save") { _, _ ->
+                    val newEp = editText.text.toString().trim()
+                    if (newEp.isNotEmpty()) {
+                        val newEpisodeText = if (item.isAnime) "Episode $newEp"
+                        else "Episode $newEp · ${item.status}"
+                        val updatedItem = item.copy(episode = newEpisodeText)
+                        updateItemInList(item, updatedItem)
+                        tvEpisode.text = updatedItem.episode
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
+        btnMarkComplete.setOnClickListener {
+            val updatedItem = item.copy(
+                status = "Complete",
+                episode = item.episode.replace("Ongoing", "Complete")
+            )
+            updateItemInList(item, updatedItem)
+            chipStatus.text = "Complete"
+            btnMarkComplete.isEnabled = false
+            btnMarkComplete.alpha = 0.5f
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun updateItemInList(old: ContentItem, new: ContentItem) {
+        val animeIdx = animeList.indexOf(old)
+        if (animeIdx >= 0) { animeList[animeIdx] = new; animeAdapter.notifyItemChanged(animeIdx) }
+        val dramaIdx = dramaList.indexOf(old)
+        if (dramaIdx >= 0) { dramaList[dramaIdx] = new; dramaAdapter.notifyItemChanged(dramaIdx) }
+    }
+
+    private fun showAddContentDialog() {
+        selectedImageUri = null
+        selectedCategory = "Love"
+        selectedStatus = "Ongoing"
+        currentPreviewImage = null
+        currentPlaceholder = null
+
+        val dialog = Dialog(this, R.style.Theme_StreamVerse_FullDialog)
+        dialog.setContentView(R.layout.dialog_add_content)
+        dialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setGravity(android.view.Gravity.BOTTOM)
+
+        val tvTitle = dialog.findViewById<TextView>(R.id.TV_DialogTitle)
+        val btnSave = dialog.findViewById<MaterialButton>(R.id.BTN_SaveContent)
+        val etTitle = dialog.findViewById<TextInputEditText>(R.id.ET_Title)
+        val etDescription = dialog.findViewById<TextInputEditText>(R.id.ET_Description)
+        val etEpisode = dialog.findViewById<TextInputEditText>(R.id.ET_Episode)
+        val ivPreview = dialog.findViewById<ImageView>(R.id.IV_ImagePreview)
+        val llPlaceholder = dialog.findViewById<View>(R.id.LL_ImagePlaceholder)
+        val btnUpload = dialog.findViewById<MaterialButton>(R.id.BTN_UploadPhoto)
+        val chipCatComedy = dialog.findViewById<Chip>(R.id.CHIP_CatComedy)
+
+        currentPreviewImage = ivPreview
+        currentPlaceholder = llPlaceholder
+
+        if (isAnimeTab) {
+            tvTitle.text = "Add Anime"
+            btnSave.text = "Save Anime"
+            chipCatComedy.visibility = View.VISIBLE
+        } else {
+            tvTitle.text = "Add Drama"
+            btnSave.text = "Save Drama"
+            chipCatComedy.visibility = View.GONE
+        }
+
+        btnUpload.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        }
+
+        val chipCatLove = dialog.findViewById<Chip>(R.id.CHIP_CatLove)
+        val chipCatAction = dialog.findViewById<Chip>(R.id.CHIP_CatAction)
+        val catChips = listOf(chipCatLove, chipCatAction, chipCatComedy)
+
+        chipCatLove.setOnClickListener { selectedCategory = "Love"; setDialogActiveChip(chipCatLove, catChips) }
+        chipCatAction.setOnClickListener { selectedCategory = "Action"; setDialogActiveChip(chipCatAction, catChips) }
+        chipCatComedy.setOnClickListener { selectedCategory = "Comedy"; setDialogActiveChip(chipCatComedy, catChips) }
+
+        val btnOngoing = dialog.findViewById<MaterialButton>(R.id.BTN_StatusOngoing)
+        val btnComplete = dialog.findViewById<MaterialButton>(R.id.BTN_StatusComplete)
+        btnOngoing.setOnClickListener { selectedStatus = "Ongoing"; setDialogActiveStatus(true, btnOngoing, btnComplete) }
+        btnComplete.setOnClickListener { selectedStatus = "Complete"; setDialogActiveStatus(false, btnOngoing, btnComplete) }
+
+        dialog.findViewById<ImageButton>(R.id.BTN_CloseDialog).setOnClickListener {
+            currentPreviewImage = null
+            currentPlaceholder = null
+            dialog.dismiss()
+        }
+
+        btnSave.setOnClickListener {
+            val title = etTitle.text.toString().trim()
+            val description = etDescription.text.toString().trim()
+            val episode = etEpisode.text.toString().trim()
+
+            if (title.isEmpty()) { etTitle.error = "Please enter a title"; return@setOnClickListener }
+
+            val episodeText = if (isAnimeTab) "Episode $episode"
+            else "Episode $episode · $selectedStatus"
+
+            val newItem = ContentItem(
+                title = title,
+                description = description,
+                episode = episodeText,
+                rating = "5", // Default rating, editable in detail view
+                category = selectedCategory,
+                status = selectedStatus,
+                isAnime = isAnimeTab,
+                imageUri = selectedImageUri?.toString()
+            )
+
+            if (isAnimeTab) animeList.add(0, newItem)
+            else dramaList.add(0, newItem)
+
+            applyFilter()
+
+            currentPreviewImage = null
+            currentPlaceholder = null
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = data?.data
+            selectedImageUri?.let { uri ->
+                currentPreviewImage?.setImageURI(uri)
+                currentPreviewImage?.visibility = View.VISIBLE
+                currentPlaceholder?.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun setDialogActiveChip(selected: Chip, allChips: List<Chip?>) {
+        allChips.forEach { chip ->
+            if (chip == selected) {
+                chip?.chipBackgroundColor = getColorStateList(R.color.purple_500)
+                chip?.setTextColor(getColor(android.R.color.white))
+            } else {
+                chip?.chipBackgroundColor = getColorStateList(R.color.bg_card)
+                chip?.setTextColor(getColor(R.color.text_secondary))
+            }
+        }
+    }
+
+    private fun setDialogActiveStatus(isOngoing: Boolean, btnOngoing: MaterialButton, btnComplete: MaterialButton) {
+        if (isOngoing) {
+            btnOngoing.backgroundTintList = getColorStateList(R.color.purple_500)
+            btnOngoing.setTextColor(getColor(android.R.color.white))
+            btnComplete.backgroundTintList = getColorStateList(R.color.bg_card)
+            btnComplete.setTextColor(getColor(R.color.text_secondary))
+        } else {
+            btnComplete.backgroundTintList = getColorStateList(R.color.purple_500)
+            btnComplete.setTextColor(getColor(android.R.color.white))
+            btnOngoing.backgroundTintList = getColorStateList(R.color.bg_card)
+            btnOngoing.setTextColor(getColor(R.color.text_secondary))
+        }
+    }
+
     private fun setActiveTab(isAnime: Boolean) {
         if (isAnime) {
             btnTabAnime.backgroundTintList = getColorStateList(R.color.purple_500)
             btnTabAnime.setTextColor(getColor(android.R.color.white))
+            btnTabAnime.iconTint = getColorStateList(android.R.color.white)
             btnTabDrama.backgroundTintList = getColorStateList(R.color.bg_card)
             btnTabDrama.setTextColor(getColor(R.color.text_secondary))
+            btnTabDrama.iconTint = getColorStateList(R.color.text_secondary)
         } else {
             btnTabDrama.backgroundTintList = getColorStateList(R.color.purple_500)
             btnTabDrama.setTextColor(getColor(android.R.color.white))
+            btnTabDrama.iconTint = getColorStateList(android.R.color.white)
             btnTabAnime.backgroundTintList = getColorStateList(R.color.bg_card)
             btnTabAnime.setTextColor(getColor(R.color.text_secondary))
+            btnTabAnime.iconTint = getColorStateList(R.color.text_secondary)
         }
     }
 
