@@ -271,21 +271,24 @@ class MainActivity : AppCompatActivity() {
             btnMarkComplete.alpha = 0.5f
         }
 
-        // Load image — fitCenter to respect portrait sizing, bypass cache for old entries
+        // Load image — safely check file exists first, fallback to placeholder if missing
         if (!item.imageUri.isNullOrEmpty()) {
             val file = File(item.imageUri)
-            val imageSource: Any = if (file.exists()) file else Uri.parse(item.imageUri)
-            Glide.with(this)
-                .load(imageSource)
-                .apply(
-                    RequestOptions()
-                        .fitCenter()
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
-                        .placeholder(android.R.drawable.ic_menu_gallery)
-                        .error(android.R.drawable.ic_menu_gallery)
-                )
-                .into(ivImage)
+            if (file.exists()) {
+                Glide.with(this)
+                    .load(file)
+                    .apply(
+                        RequestOptions()
+                            .fitCenter()
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .placeholder(android.R.drawable.ic_menu_gallery)
+                            .error(android.R.drawable.ic_menu_gallery)
+                    )
+                    .into(ivImage)
+            } else {
+                ivImage.setImageResource(android.R.drawable.ic_menu_gallery)
+            }
         } else {
             ivImage.setImageResource(android.R.drawable.ic_menu_gallery)
         }
