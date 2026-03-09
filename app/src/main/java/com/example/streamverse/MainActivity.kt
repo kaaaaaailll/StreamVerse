@@ -28,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -139,7 +140,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Pinned items always on top
         val sorted = filtered.sortedByDescending { it.isPinned }
 
         if (isAnimeTab) {
@@ -259,7 +259,6 @@ class MainActivity : AppCompatActivity() {
         chipStatus.text = item.status
         seekBarRating.progress = currentRating - 1
 
-        // Set pin button color based on current state
         btnPin.setColorFilter(
             if (currentItem.isPinned)
                 getColor(R.color.purple_light)
@@ -272,20 +271,35 @@ class MainActivity : AppCompatActivity() {
             btnMarkComplete.alpha = 0.5f
         }
 
-        if (item.imageUri != null) {
-            Glide.with(this)
-                .load(Uri.parse(item.imageUri))
-                .apply(
-                    RequestOptions()
-                        .fitCenter()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .placeholder(android.R.drawable.ic_menu_gallery)
-                        .error(android.R.drawable.ic_menu_gallery)
-                )
-                .into(ivImage)
+        // Load image from permanent file path
+        if (!item.imageUri.isNullOrEmpty()) {
+            val file = File(item.imageUri)
+            if (file.exists()) {
+                Glide.with(this)
+                    .load(file)
+                    .apply(
+                        RequestOptions()
+                            .fitCenter()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(android.R.drawable.ic_menu_gallery)
+                            .error(android.R.drawable.ic_menu_gallery)
+                    )
+                    .into(ivImage)
+            } else {
+                // Fallback: try loading as URI string
+                Glide.with(this)
+                    .load(Uri.parse(item.imageUri))
+                    .apply(
+                        RequestOptions()
+                            .fitCenter()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(android.R.drawable.ic_menu_gallery)
+                            .error(android.R.drawable.ic_menu_gallery)
+                    )
+                    .into(ivImage)
+            }
         }
 
-        // Pin toggle
         btnPin.setOnClickListener {
             val updatedItem = currentItem.copy(isPinned = !currentItem.isPinned)
             dbHelper.updateContent(updatedItem)
@@ -320,6 +334,7 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Delete")
                 .setMessage("Are you sure you want to delete \"${item.title}\"?")
                 .setPositiveButton("Delete") { _, _ ->
+                    item.imageUri?.let { path -> ImageUtils.deleteImage(path) }
                     dbHelper.deleteContent(item.id)
                     animeList.removeAll { it.id == item.id }
                     dramaList.removeAll { it.id == item.id }
@@ -454,6 +469,11 @@ class MainActivity : AppCompatActivity() {
             val episodeText = if (isAnimeTab) "Episode $episode"
             else "Episode $episode · $selectedStatus"
 
+            // ✅ Copy image to permanent app storage before saving
+            val permanentImagePath = selectedImageUri?.let { uri ->
+                ImageUtils.copyImageToAppStorage(this, uri)
+            }
+
             val newItem = ContentItem(
                 title = title,
                 description = description,
@@ -462,7 +482,7 @@ class MainActivity : AppCompatActivity() {
                 category = selectedCategory,
                 status = selectedStatus,
                 isAnime = isAnimeTab,
-                imageUri = selectedImageUri?.toString()
+                imageUri = permanentImagePath
             )
 
             val newId = dbHelper.insertContent(newItem)
