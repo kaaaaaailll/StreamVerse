@@ -31,6 +31,17 @@
                 android:textStyle="bold"
                 android:letterSpacing="0.01" />
 
+            <!-- Pin Button -->
+            <ImageButton
+                android:id="@+id/BTN_PinContent"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:background="@null"
+                android:tint="#7a7a9a"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Pin" />
+
             <!-- Delete Button -->
             <ImageButton
                 android:id="@+id/BTN_DeleteContent"
@@ -55,7 +66,7 @@
         <!-- Cover Image -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="210dp"
+            android:layout_height="180dp"
             android:layout_marginBottom="18dp"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
@@ -65,7 +76,8 @@
                 android:id="@+id/IV_DetailImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
+                android:padding="8dp"
                 android:src="@android:drawable/ic_menu_gallery" />
         </androidx.cardview.widget.CardView>
 

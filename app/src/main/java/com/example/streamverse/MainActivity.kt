@@ -7,6 +7,8 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.EditText
@@ -37,12 +39,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnAddContent: FloatingActionButton
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var rvContentList: RecyclerView
+    private lateinit var etSearch: EditText
+    private lateinit var btnClearSearch: ImageButton
 
     private var isAnimeTab = true
     private var selectedImageUri: Uri? = null
     private var selectedCategory = "Love"
     private var selectedStatus = "Ongoing"
     private var activeGenreFilter = "Love"
+    private var searchQuery = ""
 
     private var currentPreviewImage: ImageView? = null
     private var currentPlaceholder: View? = null
@@ -109,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         bottomNav = findViewById(R.id.BNV_BottomNav)
         rvContentList = findViewById(R.id.RV_ContentList)
         rvContentList.layoutManager = LinearLayoutManager(this)
+        etSearch = findViewById(R.id.ET_Search)
+        btnClearSearch = findViewById(R.id.BTN_ClearSearch)
     }
 
     private fun setupAdapters() {
@@ -123,16 +130,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyFilter() {
         val sourceList = if (isAnimeTab) animeList else dramaList
-        val filtered = sourceList.filter { it.category == activeGenreFilter }
+        var filtered = sourceList.filter { it.category == activeGenreFilter }
+
+        if (searchQuery.isNotEmpty()) {
+            filtered = filtered.filter {
+                it.title.contains(searchQuery, ignoreCase = true) ||
+                        it.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+        // Pinned items always on top
+        val sorted = filtered.sortedByDescending { it.isPinned }
+
         if (isAnimeTab) {
-            animeAdapter.updateList(filtered)
+            animeAdapter.updateList(sorted)
         } else {
-            dramaAdapter.updateList(filtered)
+            dramaAdapter.updateList(sorted)
         }
 
         val emptyState = findViewById<View>(R.id.LL_EmptyState)
         val recyclerView = findViewById<RecyclerView>(R.id.RV_ContentList)
-        if (filtered.isEmpty()) {
+        if (sorted.isEmpty()) {
             emptyState.visibility = View.VISIBLE
             recyclerView.visibility = View.GONE
         } else {
@@ -178,6 +196,23 @@ class MainActivity : AppCompatActivity() {
             applyFilter()
         }
 
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery = s?.toString()?.trim() ?: ""
+                btnClearSearch.visibility = if (searchQuery.isNotEmpty()) View.VISIBLE else View.GONE
+                applyFilter()
+            }
+        })
+
+        btnClearSearch.setOnClickListener {
+            etSearch.setText("")
+            searchQuery = ""
+            btnClearSearch.visibility = View.GONE
+            applyFilter()
+        }
+
         btnAddContent.setOnClickListener { showAddContentDialog() }
 
         bottomNav.setOnItemSelectedListener { item ->
@@ -208,6 +243,7 @@ class MainActivity : AppCompatActivity() {
         val chipStatus = dialog.findViewById<Chip>(R.id.CHIP_DetailStatus)
         val btnClose = dialog.findViewById<ImageButton>(R.id.BTN_CloseDetail)
         val btnDelete = dialog.findViewById<ImageButton>(R.id.BTN_DeleteContent)
+        val btnPin = dialog.findViewById<ImageButton>(R.id.BTN_PinContent)
         val btnEditEpisode = dialog.findViewById<MaterialButton>(R.id.BTN_EditEpisode)
         val btnMarkComplete = dialog.findViewById<MaterialButton>(R.id.BTN_MarkComplete)
 
@@ -223,23 +259,44 @@ class MainActivity : AppCompatActivity() {
         chipStatus.text = item.status
         seekBarRating.progress = currentRating - 1
 
+        // Set pin button color based on current state
+        btnPin.setColorFilter(
+            if (currentItem.isPinned)
+                getColor(R.color.purple_light)
+            else
+                getColor(R.color.text_secondary)
+        )
+
         if (item.status == "Complete") {
             btnMarkComplete.isEnabled = false
             btnMarkComplete.alpha = 0.5f
         }
 
-        // Use Glide for detail dialog image too
         if (item.imageUri != null) {
             Glide.with(this)
                 .load(Uri.parse(item.imageUri))
                 .apply(
                     RequestOptions()
-                        .centerCrop()
+                        .fitCenter()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(android.R.drawable.ic_menu_gallery)
                         .error(android.R.drawable.ic_menu_gallery)
                 )
                 .into(ivImage)
+        }
+
+        // Pin toggle
+        btnPin.setOnClickListener {
+            val updatedItem = currentItem.copy(isPinned = !currentItem.isPinned)
+            dbHelper.updateContent(updatedItem)
+            updateItemInList(currentItem, updatedItem)
+            currentItem = updatedItem
+            btnPin.setColorFilter(
+                if (currentItem.isPinned)
+                    getColor(R.color.purple_light)
+                else
+                    getColor(R.color.text_secondary)
+            )
         }
 
         seekBarRating.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -429,12 +486,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             selectedImageUri = data?.data
             selectedImageUri?.let { uri ->
-                // Use Glide for preview image too
                 Glide.with(this)
                     .load(uri)
                     .apply(
                         RequestOptions()
-                            .centerCrop()
+                            .centerInside()
+                            .override(800, 600)
                             .placeholder(android.R.drawable.ic_menu_gallery)
                     )
                     .into(currentPreviewImage!!)

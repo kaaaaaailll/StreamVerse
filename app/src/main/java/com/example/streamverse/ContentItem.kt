@@ -9,5 +9,6 @@ data class ContentItem(
     val category: String,
     val status: String,
     val isAnime: Boolean,
-    val imageUri: String? = null
+    val imageUri: String? = null,
+    val isPinned: Boolean = false
 )

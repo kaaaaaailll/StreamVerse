@@ -11,7 +11,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
 
     companion object {
         const val DATABASE_NAME = "streamverse.db"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
         const val TABLE_CONTENT = "content"
         const val COL_ID = "id"
         const val COL_TITLE = "title"
@@ -22,6 +22,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         const val COL_STATUS = "status"
         const val COL_IS_ANIME = "is_anime"
         const val COL_IMAGE_URI = "image_uri"
+        const val COL_IS_PINNED = "is_pinned"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -35,15 +36,17 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                 $COL_CATEGORY TEXT,
                 $COL_STATUS TEXT,
                 $COL_IS_ANIME INTEGER,
-                $COL_IMAGE_URI TEXT
+                $COL_IMAGE_URI TEXT,
+                $COL_IS_PINNED INTEGER DEFAULT 0
             )
         """.trimIndent()
         db.execSQL(createTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTENT")
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE $TABLE_CONTENT ADD COLUMN $COL_IS_PINNED INTEGER DEFAULT 0")
+        }
     }
 
     fun insertContent(item: ContentItem): Long {
@@ -58,6 +61,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                 put(COL_STATUS, item.status)
                 put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
                 put(COL_IMAGE_URI, item.imageUri)
+                put(COL_IS_PINNED, if (item.isPinned) 1 else 0)
             }
             db.insert(TABLE_CONTENT, null, values)
         } catch (e: Exception) {
@@ -78,7 +82,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                 TABLE_CONTENT, null,
                 "$COL_IS_ANIME = ?",
                 arrayOf(if (isAnime) "1" else "0"),
-                null, null, "$COL_ID DESC"
+                null, null,
+                "$COL_IS_PINNED DESC, $COL_ID DESC"
             )
             while (cursor.moveToNext()) {
                 list.add(
@@ -91,7 +96,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                         category = cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY)) ?: "Love",
                         status = cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS)) ?: "Ongoing",
                         isAnime = cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_ANIME)) == 1,
-                        imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI))
+                        imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI)),
+                        isPinned = cursor.getInt(cursor.getColumnIndexOrThrow(COL_IS_PINNED)) == 1
                     )
                 )
             }
@@ -115,6 +121,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
                 put(COL_STATUS, item.status)
                 put(COL_IS_ANIME, if (item.isAnime) 1 else 0)
                 put(COL_IMAGE_URI, item.imageUri)
+                put(COL_IS_PINNED, if (item.isPinned) 1 else 0)
             }
             db.update(TABLE_CONTENT, values, "$COL_ID = ?", arrayOf(item.id.toString()))
         } catch (e: Exception) {

@@ -29,7 +29,7 @@
         <!-- Info -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="148dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="vertical"
@@ -39,13 +39,13 @@
             <TextView
                 android:id="@+id/TV_ContentTitle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="33dp"
                 android:layout_marginBottom="4dp"
                 android:ellipsize="end"
                 android:lineSpacingMultiplier="1.2"
                 android:maxLines="2"
                 android:textColor="#FFFFFF"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <!-- Description -->
@@ -58,7 +58,7 @@
                 android:lineSpacingMultiplier="1.4"
                 android:maxLines="2"
                 android:textColor="#9a9ab8"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
             <!-- Episode Info -->
             <TextView
@@ -82,7 +82,7 @@
                     android:layout_marginEnd="4dp"
                     android:text="★"
                     android:textColor="#FFD700"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/TV_Rating"
