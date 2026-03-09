@@ -39,7 +39,7 @@
             <TextView
                 android:id="@+id/TV_ContentTitle"
                 android:layout_width="match_parent"
-                android:layout_height="33dp"
+                android:layout_height="39dp"
                 android:layout_marginBottom="4dp"
                 android:ellipsize="end"
                 android:lineSpacingMultiplier="1.2"
