@@ -271,33 +271,20 @@ class MainActivity : AppCompatActivity() {
             btnMarkComplete.alpha = 0.5f
         }
 
-        // Load image from permanent file path
+        // Load image — centerCrop to fill the box
         if (!item.imageUri.isNullOrEmpty()) {
             val file = File(item.imageUri)
-            if (file.exists()) {
-                Glide.with(this)
-                    .load(file)
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(android.R.drawable.ic_menu_gallery)
-                            .error(android.R.drawable.ic_menu_gallery)
-                    )
-                    .into(ivImage)
-            } else {
-                // Fallback: try loading as URI string
-                Glide.with(this)
-                    .load(Uri.parse(item.imageUri))
-                    .apply(
-                        RequestOptions()
-                            .fitCenter()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(android.R.drawable.ic_menu_gallery)
-                            .error(android.R.drawable.ic_menu_gallery)
-                    )
-                    .into(ivImage)
-            }
+            val imageSource: Any = if (file.exists()) file else Uri.parse(item.imageUri)
+            Glide.with(this)
+                .load(imageSource)
+                .apply(
+                    RequestOptions()
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_gallery)
+                )
+                .into(ivImage)
         }
 
         btnPin.setOnClickListener {
@@ -469,7 +456,6 @@ class MainActivity : AppCompatActivity() {
             val episodeText = if (isAnimeTab) "Episode $episode"
             else "Episode $episode · $selectedStatus"
 
-            // ✅ Copy image to permanent app storage before saving
             val permanentImagePath = selectedImageUri?.let { uri ->
                 ImageUtils.copyImageToAppStorage(this, uri)
             }

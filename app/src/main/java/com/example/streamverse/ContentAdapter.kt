@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import java.io.File
 
 class ContentAdapter(
     private val items: MutableList<ContentItem>,
@@ -40,9 +41,12 @@ class ContentAdapter(
         holder.episode.text = item.episode
         holder.rating.text = item.rating
 
-        if (item.imageUri != null) {
+        if (!item.imageUri.isNullOrEmpty()) {
+            val file = File(item.imageUri)
+            val imageSource: Any = if (file.exists()) file else Uri.parse(item.imageUri)
+
             Glide.with(holder.thumbnail.context)
-                .load(Uri.parse(item.imageUri))
+                .load(imageSource)
                 .apply(
                     RequestOptions()
                         .override(200, 200)

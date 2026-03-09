@@ -76,8 +76,7 @@
                 android:id="@+id/IV_DetailImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="fitCenter"
-                android:padding="8dp"
+                android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery" />
         </androidx.cardview.widget.CardView>
 
