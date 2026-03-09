@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity() {
             btnMarkComplete.alpha = 0.5f
         }
 
-        // Load image — centerCrop to fill the box
+        // Load image — fitCenter to respect portrait sizing, bypass cache for old entries
         if (!item.imageUri.isNullOrEmpty()) {
             val file = File(item.imageUri)
             val imageSource: Any = if (file.exists()) file else Uri.parse(item.imageUri)
@@ -279,12 +279,15 @@ class MainActivity : AppCompatActivity() {
                 .load(imageSource)
                 .apply(
                     RequestOptions()
-                        .centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .fitCenter()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
                         .placeholder(android.R.drawable.ic_menu_gallery)
                         .error(android.R.drawable.ic_menu_gallery)
                 )
                 .into(ivImage)
+        } else {
+            ivImage.setImageResource(android.R.drawable.ic_menu_gallery)
         }
 
         btnPin.setOnClickListener {
